@@ -1,5 +1,14 @@
-import Image from 'next/image';
+import { UserButton } from '@clerk/nextjs'
+import React from 'react'
 
-export default function Home() {
-  return <div className="">Home</div>;
+const Home = () => {
+  return (
+    <div>
+      <p>Home</p>
+
+      <UserButton afterSignOutUrl='/' />
+    </div>
+  )
 }
+
+export default Home
