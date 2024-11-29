@@ -11,15 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
   aspectRatioOptions,
@@ -31,12 +23,12 @@ import { CustomField } from './CustomField';
 import { useEffect, useState, useTransition } from 'react';
 import { AspectRatioKey, debounce, deepMergeObjects } from '@/lib/utils';
 import MediaUploader from './MediaUploader';
-// import TransformedImage from "./TransformedImage"
+import TransformedImage from './TransformedImage';
 import { updateCredits } from '@/lib/actions/user.actions';
-// import { getCldImageUrl } from "next-cloudinary"
-// import { addImage, updateImage } from "@/lib/actions/image.actions"
+import { getCldImageUrl } from 'next-cloudinary';
+import { addImage, updateImage } from '@/lib/actions/image.actions';
 import { useRouter } from 'next/navigation';
-// import { InsufficientCreditsModal } from "./InsufficientCreditsModal"
+import { InsufficientCreditsModal } from './InsufficientCreditsModal';
 
 export const formSchema = z.object({
   title: z.string(),
@@ -86,12 +78,12 @@ const TransformationForm = ({
     setIsSubmitting(true);
 
     if (data || image) {
-      //   const transformationUrl = getCldImageUrl({
-      //     width: image?.width,
-      //     height: image?.height,
-      //     src: image?.publicId,
-      //     ...transformationConfig
-      //   })
+      const transformationUrl = getCldImageUrl({
+        width: image?.width,
+        height: image?.height,
+        src: image?.publicId,
+        ...transformationConfig,
+      });
 
       const imageData = {
         title: values.title,
@@ -101,48 +93,48 @@ const TransformationForm = ({
         height: image?.height,
         config: transformationConfig,
         secureURL: image?.secureURL,
-        // transformationURL: transformationUrl,
+        transformationURL: transformationUrl,
         aspectRatio: values.aspectRatio,
         prompt: values.prompt,
         color: values.color,
       };
 
-      //   if(action === 'Add') {
-      //     try {
-      //     //   const newImage = await addImage({
-      //     //     image: imageData,
-      //     //     userId,
-      //     //     path: '/'
-      //     //   })
+      if (action === 'Add') {
+        try {
+          const newImage = await addImage({
+            image: imageData,
+            userId,
+            path: '/',
+          });
 
-      //       if(newImage) {
-      //         form.reset()
-      //         setImage(data)
-      //         router.push(`/transformations/${newImage._id}`)
-      //       }
-      //     } catch (error) {
-      //       console.log(error);
-      //     }
-      //   }
+          if (newImage) {
+            form.reset();
+            setImage(data);
+            router.push(`/transformations/${newImage._id}`);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
 
-      //   if(action === 'Update') {
-      //     try {
-      //     //   const updatedImage = await updateImage({
-      //     //     image: {
-      //     //       ...imageData,
-      //     //       _id: data._id
-      //     //     },
-      //     //     userId,
-      //     //     path: `/transformations/${data._id}`
-      //     //   })
+      if (action === 'Update') {
+        try {
+          const updatedImage = await updateImage({
+            image: {
+              ...imageData,
+              _id: data._id,
+            },
+            userId,
+            path: `/transformations/${data._id}`,
+          });
 
-      //       if(updatedImage) {
-      //         router.push(`/transformations/${updatedImage._id}`)
-      //       }
-      //     } catch (error) {
-      //       console.log(error);
-      //     }
-      //   }
+          if (updatedImage) {
+            router.push(`/transformations/${updatedImage._id}`);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
     }
 
     setIsSubmitting(false);
@@ -208,7 +200,7 @@ const TransformationForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {/* {creditBalance < Math.abs(creditFee) && <InsufficientCreditsModal />} */}
+        {creditBalance < Math.abs(creditFee) && <InsufficientCreditsModal />}
         <CustomField
           control={form.control}
           name="title"
@@ -311,14 +303,14 @@ const TransformationForm = ({
             )}
           />
 
-          {/* <TransformedImage
+          <TransformedImage
             image={image}
             type={type}
             title={form.getValues().title}
             isTransforming={isTransforming}
             setIsTransforming={setIsTransforming}
             transformationConfig={transformationConfig}
-          /> */}
+          />
         </div>
 
         <div className="flex flex-col gap-4">
