@@ -113,7 +113,7 @@ const TransformationForm = ({
             router.push(`/transformations/${newImage._id}`);
           }
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
       }
 
@@ -132,7 +132,7 @@ const TransformationForm = ({
             router.push(`/transformations/${updatedImage._id}`);
           }
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
       }
     }
